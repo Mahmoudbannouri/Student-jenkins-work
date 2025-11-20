@@ -1,6 +1,12 @@
 pipeline {
   agent any
+  triggers {
+    // Option A: Poll GitHub every minute (works behind Vagrant/private IP)
+    pollSCM('* * * * *')
 
+    // Option B: Use GitHub webhook instead (uncomment if you expose Jenkins)
+    // githubPush()
+  }
   stages {
 
     stage('Checkout') {
