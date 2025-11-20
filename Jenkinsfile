@@ -49,7 +49,7 @@ pipeline {
       }
     }
 
-  } // end stages
+  } // END stages
 
   post {
     success {
