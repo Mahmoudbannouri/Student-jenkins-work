@@ -1,14 +1,19 @@
 pipeline {
   agent any
+
   triggers {
-    // Option A: Poll GitHub every minute (works behind Vagrant/private IP)
+    // Works behind Vagrant/private network (polls GitHub every minute)
     pollSCM('* * * * *')
 
-    // Option B: Use GitHub webhook instead (uncomment if you expose Jenkins)
+    // If you expose Jenkins via ngrok or port-forwarding, enable GitHub webhook:
     // githubPush()
   }
+
   stages {
 
+    /* ==========================================
+     * CHECKOUT
+     * ========================================== */
     stage('Checkout') {
       steps {
         checkout scm
@@ -25,28 +30,45 @@ pipeline {
       }
     }
 
+    /* ==========================================
+     * BUILD
+     * ========================================== */
     stage('Build') {
       steps {
         sh 'echo "👉 Build step goes here"'
       }
     }
 
+    /* ==========================================
+     * SONARQUBE ANALYSIS
+     * ========================================== */
     stage('SonarQube Analysis') {
       steps {
         withSonarQubeEnv('SonarQube') {
-          sh "${tool 'sonar-scanner'}/bin/sonar-scanner"
-
+          sh """
+            echo 'Running SonarQube Analysis...'
+            ${tool 'sonar-scanner'}/bin/sonar-scanner \
+              -Dsonar.projectKey=student-pipeline \
+              -Dsonar.sources=. \
+              -Dsonar.host.url=$SONAR_HOST_URL \
+              -Dsonar.login=$SONAR_AUTH_TOKEN
+          """
         }
       }
     }
 
+    /* ==========================================
+     * TESTS
+     * ========================================== */
     stage('Test') {
       steps {
         sh 'echo "👉 Test step goes here"'
       }
     }
 
-
+    /* ==========================================
+     * SUMMARY
+     * ========================================== */
     stage('Summary') {
       steps {
         script {
@@ -60,6 +82,9 @@ pipeline {
   } // END stages
 
 
+  /* ==========================================
+   * POST ACTIONS
+   * ========================================== */
   post {
     success {
       echo "✅ Pipeline succeeded"
