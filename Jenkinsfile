@@ -28,7 +28,8 @@ pipeline {
     stage('SonarQube Analysis') {
       steps {
         withSonarQubeEnv('SonarQube') {
-          sh 'nvm run sonar'
+          sh "${tool 'sonar-scanner'}/bin/sonar-scanner"
+
         }
       }
     }
