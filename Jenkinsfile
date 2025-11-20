@@ -1,13 +1,6 @@
 pipeline {
   agent any
 
-  triggers {
-    // Option A: Poll GitHub every minute (works behind Vagrant/private IP)
-    pollSCM('* * * * *')
-
-    // Option B: Use GitHub webhook instead (uncomment if you expose Jenkins)
-    // githubPush()
-  }
 
   stages {
     stage('Checkout') {
@@ -31,12 +24,18 @@ pipeline {
         sh 'echo "👉 Build step goes here"'
       }
     }
-
+    stage('SonarQube Analysis') {
+      steps {
+      withSonarQubeEnv('SonarQube'){
+        sh 'nvm run sonar'
+      }
+    }
     stage('Test') {
       steps {
         sh 'echo "👉 Test step goes here"'
       }
     }
+
 
     stage('Summary') {
       steps {
