@@ -1,8 +1,8 @@
 pipeline {
   agent any
 
-
   stages {
+
     stage('Checkout') {
       steps {
         checkout scm
@@ -24,18 +24,20 @@ pipeline {
         sh 'echo "👉 Build step goes here"'
       }
     }
+
     stage('SonarQube Analysis') {
       steps {
-      withSonarQubeEnv('SonarQube'){
-        sh 'nvm run sonar'
+        withSonarQubeEnv('SonarQube') {
+          sh 'nvm run sonar'
+        }
       }
     }
+
     stage('Test') {
       steps {
         sh 'echo "👉 Test step goes here"'
       }
     }
-
 
     stage('Summary') {
       steps {
@@ -46,7 +48,8 @@ pipeline {
         }
       }
     }
-  }
+
+  } // end stages
 
   post {
     success {
